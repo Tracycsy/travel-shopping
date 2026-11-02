@@ -530,7 +530,7 @@ function pickTrip(){
 }
 const tripItems=id=>items.filter(i=>i.trip===id);
 const taxOn=()=>ls.get("tax:"+cur)==="1";
-const photoUrl=p=>p? sb.storage.from(PHOTO_BUCKET).getPublicUrl(p).data.publicUrl : "";
+const photoUrl=p=>!p? "" : /^https?:\/\//.test(p)? p : sb.storage.from(PHOTO_BUCKET).getPublicUrl(p).data.publicUrl;
 const L=t=>t?.localLabel||"當地";
 const shopLabel=(t,id)=>(t.shops||[]).find(s=>s.id===id)?.label||"";
 
@@ -897,7 +897,7 @@ $("#itemDel").onclick=()=>{
   ask("刪除「"+(it.zh||it.en)+"」？","刪除之後救唔返。","刪除",async()=>{
     items=items.filter(x=>x.id!==it.id); render();
     const {error}=await sb.from("items").delete().eq("id",it.id);
-    if(!failed(error)){ toast("已刪除"); if(it.img) sb.storage.from(PHOTO_BUCKET).remove([it.img]); }
+    if(!failed(error)){ toast("已刪除"); if(it.img && !/^https?:\/\//.test(it.img)) sb.storage.from(PHOTO_BUCKET).remove([it.img]); }
   });
 };
 
